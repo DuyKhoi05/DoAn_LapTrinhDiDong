@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:orientation="vertical"
+        android:padding="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.074"
+        tools:ignore="MissingConstraints">
+
+        <EditText
+            android:id="@+id/edt_product_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/title"
+            android:importantForAutofill="no"
+            android:textColorHint="@color/black"
+            android:textColor="@color/black"
+            tools:ignore="textCapSentences" />
+
+        <EditText
+            android:id="@+id/edt_product_price"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/price"
+            android:importantForAutofill="no"
+            android:textColorHint="@color/black"
+            android:inputType="numberDecimal"
+            android:textColor="@color/black" />
+
+        <EditText
+            android:id="@+id/edt_product_description"
+            android:layout_width="match_parent"
+            android:importantForAutofill="no"
+            android:textColorHint="@color/black"
+            android:layout_height="wrap_content"
+            android:hint="@string/description"
+            android:textColor="@color/black"
+            tools:ignore="TextFields" />
+
+        <Spinner
+            android:id="@+id/spinner_category"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:textColor="@color/black" />
+
+
+        <ImageView
+            android:id="@+id/img_product_preview"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_marginTop="8dp"
+            android:importantForAccessibility="no"
+            android:scaleType="centerCrop" />
+
+        <Button
+            android:id="@+id/btn_select_image"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/select_image" />
+
+        <Button
+            android:id="@+id/btn_upload_product"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/upload_product" />
+    </LinearLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

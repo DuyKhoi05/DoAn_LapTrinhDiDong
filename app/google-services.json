@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "612994072741",
+    "project_id": "doan-bb276",
+    "storage_bucket": "doan-bb276.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:612994072741:android:3889b2f530a556d90acd4c",
+        "android_client_info": {
+          "package_name": "com.example.doan"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "612994072741-70m772tlnvcsogna7o69orsbnsqdp2fe.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.doan",
+            "certificate_hash": "58a201162427b0dace4960a3028b7796555699ec"
+          }
+        },
+        {
+          "client_id": "612994072741-t46pcdfdm1kivj7a6bf2gi2cvmbj0gl5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDjy8dVOshm6sUZFZ85tRL-0fsNPmcokk0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "612994072741-t46pcdfdm1kivj7a6bf2gi2cvmbj0gl5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
