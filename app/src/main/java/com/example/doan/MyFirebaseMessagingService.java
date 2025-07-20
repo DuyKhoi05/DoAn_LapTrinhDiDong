@@ -21,15 +21,20 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
 
-        // Log để kiểm tra
-        Log.d("FCM", "onMessageReceived: " + remoteMessage.getNotification());
+        String title = "Thông báo";
+        String body = "Có cái mới vui lắm";
 
         if (remoteMessage.getNotification() != null) {
-            String title = remoteMessage.getNotification().getTitle();
-            String body = remoteMessage.getNotification().getBody();
-            showNotification(title, body);
+            title = remoteMessage.getNotification().getTitle();
+            body = remoteMessage.getNotification().getBody();
+        } else if (remoteMessage.getData().size() > 0) {
+            title = remoteMessage.getData().get("title");
+            body = remoteMessage.getData().get("body");
         }
+
+        showNotification(title, body);
     }
+
 
     private void showNotification(String title, String body) {
         NotificationManager notificationManager =

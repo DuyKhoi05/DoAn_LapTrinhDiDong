@@ -116,6 +116,7 @@ public class ProductDetailActivity extends AppCompatActivity {
     }
 
     private void updateViews(String productId) {
+        Log.d("VIEWS", "Gọi updateViews cho sản phẩm: " + productId);
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if (currentUser == null || product == null) return;
 
@@ -135,7 +136,7 @@ public class ProductDetailActivity extends AppCompatActivity {
 
     private void startCheckout(Product product) {
         // Sử dụng client_secret test của bạn từ Stripe CLI
-        String clientSecret = "pi_3RjzuiJdGZiQ4fdV1TdrDQJs_secret_oHymG2NY0Kn2MSoeX30FqGtLv";
+        String clientSecret = "pi_3RmtieJdGZiQ4fdV10V3QM2G_secret_zNmJYqzObKUJ39xhS9SBKils7";
 
         PaymentSheet.Configuration config = new PaymentSheet.Configuration.Builder("Your Test Store")
                 .allowsDelayedPaymentMethods(true) // có thể bỏ nếu không dùng
@@ -182,9 +183,30 @@ public class ProductDetailActivity extends AppCompatActivity {
         FirebaseFirestore.getInstance()
                 .collection("payments")
                 .add(payment)
-                .addOnSuccessListener(doc -> Log.d("PAYMENT", "Saved"))
+                .addOnSuccessListener(doc ->{
+                    Log.d("PAYMENT", "Saved");
+                    sendPaymentNotificationToSeller(product.getOwnerId(), product.getTitle());
+                })
                 .addOnFailureListener(e -> Log.e("PAYMENT", "Failed to save", e));
     }
+
+    private void sendPaymentNotificationToSeller(String sellerId, String productTitle) {
+        FirebaseFirestore.getInstance().collection("users")
+                .document(sellerId)
+                .get()
+                .addOnSuccessListener(doc -> {
+                    String token = doc.getString("fcmToken");
+                    if (token != null) {
+                        String title = "Sản phẩm đã được bán!";
+                        String body = "Sản phẩm \"" + productTitle + "\" của bạn đã được thanh toán.";
+                        FCMSender.sendNotification(getApplicationContext(), token, title, body);
+                    } else {
+                        Log.e("FCM", "Không tìm thấy token của người bán");
+                    }
+                })
+                .addOnFailureListener(e -> Log.e("FCM", "Lỗi khi lấy thông tin người bán", e));
+    }
+
 
 
     // --- Load sản phẩm ---

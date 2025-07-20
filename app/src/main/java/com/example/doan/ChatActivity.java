@@ -75,6 +75,8 @@ public class ChatActivity extends AppCompatActivity {
             return;
         }
 
+        checkAndCreatePreviewForReceiver();
+
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new ChatAdapter(this, messageList, currentUser.getUid());
         recyclerView.setAdapter(adapter);
@@ -127,6 +129,47 @@ public class ChatActivity extends AppCompatActivity {
                 });
     }
 
+    private void checkAndCreatePreviewForReceiver() {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        String currentUid = currentUser.getUid();
+
+        db.collection("chatPreviews")
+                .document(currentUid)
+                .collection("users")
+                .document(receiverId)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (!documentSnapshot.exists()) {
+                        // Nếu chưa có, tạo preview
+                        db.collection("users").document(receiverId)
+                                .get()
+                                .addOnSuccessListener(userDoc -> {
+                                    if (userDoc.exists()) {
+                                        String name = userDoc.getString("name");
+                                        String avatarUrl = userDoc.getString("avatarUrl");
+
+                                        ChatPreview preview = new ChatPreview(
+                                                receiverId,
+                                                name != null ? name : "Unknown",
+                                                avatarUrl != null ? avatarUrl : "",
+                                                "Bắt đầu trò chuyện",
+                                                new Date()
+                                        );
+
+                                        db.collection("chatPreviews")
+                                                .document(currentUid)
+                                                .collection("users")
+                                                .document(receiverId)
+                                                .set(preview)
+                                                .addOnSuccessListener(unused -> Log.d("ChatPreview", "Preview created for receiver"))
+                                                .addOnFailureListener(e -> Log.e("ChatPreview", "Lỗi tạo ChatPreview người nhận", e));
+                                    }
+                                });
+                    }
+                });
+    }
+
+
     private void loadMessages() {
         FirebaseFirestore.getInstance()
                 .collection("messages")
@@ -161,53 +204,52 @@ public class ChatActivity extends AppCompatActivity {
                 false
         );
 
+        messageList.add(msg);
+        adapter.notifyItemInserted(messageList.size() - 1);
+        recyclerView.scrollToPosition(messageList.size() - 1);
+
+        edtMessage.setText("");
 
         FirebaseFirestore.getInstance()
                 .collection("messages")
                 .document(msg.getId())
-                .set(msg);
+                .set(msg)
+                .addOnSuccessListener(unused -> Log.d("SendMessage", "Tin nhắn đã gửi thành công"))
+                .addOnFailureListener(e -> Log.e("SendMessage", "Lỗi gửi tin nhắn", e));
 
         updateChatPreview(currentUser.getUid(), receiverId, text, new Date());
         updateChatPreview(receiverId, currentUser.getUid(), text, new Date());
-
-
-        edtMessage.setText("");
     }
 
-    private void updateChatPreview(String userId, String otherUserId, String lastMessage, Date timestamp) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        db.collection("users").document(otherUserId).get()
-                .addOnSuccessListener(snapshot -> {
-                    if (!snapshot.exists()) {
-                        Log.e("ChatPreview", "Không tìm thấy userId: " + otherUserId);
-                        return;
+    private void updateChatPreview(String ownerId, String chatWithId, String lastMessage, Date timestamp) {
+        FirebaseFirestore.getInstance().collection("users").document(chatWithId)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        String name = documentSnapshot.getString("name");
+                        String avatarUrl = documentSnapshot.getString("avatarUrl");
+
+                        ChatPreview preview = new ChatPreview(
+                                chatWithId,
+                                name != null ? name : "Unknown",
+                                avatarUrl != null ? avatarUrl : "",
+                                lastMessage,
+                                timestamp
+                        );
+
+                        FirebaseFirestore.getInstance()
+                                .collection("chatPreviews")
+                                .document(ownerId)
+                                .collection("users")
+                                .document(chatWithId)
+                                .set(preview)
+                        .addOnFailureListener(e -> Log.e("ChatPreview", "Lỗi tạo ChatPreview", e));
+
                     }
-
-                    String name = snapshot.getString("name");
-                    String avatarUrl = snapshot.getString("avatarUrl");
-
-                    if (name == null) name = "(Không tên)"; // hoặc currentUser.getDisplayName()
-
-                    ChatPreview preview = new ChatPreview(
-                            otherUserId,
-                            name,
-                            avatarUrl != null ? avatarUrl : "",
-                            lastMessage,
-                            timestamp
-                    );
-
-                    db.collection("chatPreviews")
-                            .document(userId)
-                            .collection("users")
-                            .document(otherUserId)
-                            .set(preview)
-                            .addOnSuccessListener(unused ->
-                                    Log.d("ChatPreview", "Đã lưu chat preview cho " + userId))
-                            .addOnFailureListener(e ->
-                                    Log.e("ChatPreview", "Lỗi khi lưu: " + e.getMessage()));
                 });
     }
+
 
 
 
@@ -254,6 +296,8 @@ public class ChatActivity extends AppCompatActivity {
                 .collection("messages")
                 .document(msg.getId())
                 .set(msg);
+        updateChatPreview(currentUser.getUid(), receiverId, "Đã gửi hình ảnh", new Date());
+        updateChatPreview(receiverId, currentUser.getUid(), "Đã gửi hình ảnh", new Date());
     }
 
     private String getChatId(String user1, String user2) {
